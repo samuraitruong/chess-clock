@@ -12,6 +12,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { PresetDialog } from "./Components/Preset";
 import { parsePreset } from "./Utils";
+import IconButton from "@mui/material/IconButton";
 
 const StyledBox = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#E7EBEF",
@@ -233,25 +234,37 @@ function App() {
           <MoveBox>Moves: {Math.max(0, clockState.moveCount - 1)}</MoveBox>
         </StyledBox>
         <ControlBox>
-          <RestartAltIcon color="primary" onClick={resetClock} />
+          <IconButton>
+            <RestartAltIcon color="primary" onClick={resetClock} />
+          </IconButton>
           {clockState.started && !clockState.paused && (
-            <PauseIcon color="warning" onClick={stopClock} />
+            <IconButton>
+              <PauseIcon color="warning" onClick={stopClock} />
+            </IconButton>
           )}
           {(!clockState.started || clockState.paused) && (
-            <PlayArrowIcon color="primary" onClick={startGame} />
+            <IconButton>
+              <PlayArrowIcon color="primary" onClick={startGame} />
+            </IconButton>
           )}
-          <TuneIcon color="primary" onClick={() => setOpen(true)} />
+          <IconButton>
+            <TuneIcon color="primary" onClick={() => setOpen(true)} />
+          </IconButton>
           {clockState.sound && (
-            <VolumeUpIcon
-              color="primary"
-              onClick={() => setSoundOnOff(false)}
-            />
+            <IconButton>
+              <VolumeUpIcon
+                color="primary"
+                onClick={() => setSoundOnOff(false)}
+              />
+            </IconButton>
           )}
           {!clockState.sound && (
-            <VolumeOffIcon
-              color="primary"
-              onClick={() => setSoundOnOff(true)}
-            />
+            <IconButton>
+              <VolumeOffIcon
+                color="error"
+                onClick={() => setSoundOnOff(true)}
+              />
+            </IconButton>
           )}
         </ControlBox>
         <StyledBox
