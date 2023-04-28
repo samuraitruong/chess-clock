@@ -1,6 +1,8 @@
-# Getting Started with Create React App
+# Intro
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is simple react page to build the chess tournament clock. The demonstration site can be found here: https://samuraitruong.github.io/chess-clock
+
+
 
 ## Available Scripts
 
