@@ -7,13 +7,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Dialog from "@mui/material/Dialog";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import {
-  Button,
-  IconButton,
-  ListItemIcon,
-  Stack,
-  TextField,
-} from "@mui/material";
+import { IconButton, ListItemIcon, Stack, TextField } from "@mui/material";
 
 const presets = [
   "3 min",
