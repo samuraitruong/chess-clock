@@ -20,7 +20,7 @@ const StyledBox = styled(Box)(({ theme }) => ({
   textAlign: "center",
   display: "flex",
   alignItems: "center",
-  height: "45vh",
+  height: "46vh",
   color: theme.palette.text.secondary,
   justifyContent: "center",
   position: "relative",
@@ -41,14 +41,16 @@ const PresetBox = styled(Typography)(({ theme }) => ({
   ...theme.typography.body1,
   color: theme.palette.text.secondary,
   position: "absolute",
+  bottom: "1rem",
 }));
 
 const MoveBox = styled(Typography)(({ theme }) => ({
   ...theme.typography.body1,
   color: theme.palette.text.secondary,
   position: "absolute",
-  bottom: "2rem",
-  right: "2rem",
+  bottom: "1rem",
+  left: "1rem",
+  fontWeight: "bold",
 }));
 
 const activeColor = "#77ff38";
@@ -88,7 +90,6 @@ function App() {
     });
   };
   const startGame = () => {
-    console.log("clockState", clockState);
     if (clockState.started && clockState.paused) {
       toast.info("Game Resumed");
       setClockState({
@@ -157,13 +158,11 @@ function App() {
     let whiteRemaining = clockState.whiteRemaining;
     if (clockState.startTime) {
       if (player === "white") {
-        // update white remaining time
         whiteRemaining =
           whiteRemaining -
           (new Date().getTime() - clockState.startTime?.getTime()) +
           clockState.increment;
       } else {
-        // update black remaining time
         blackRemaining =
           blackRemaining -
           (new Date().getTime() - clockState.startTime?.getTime()) +
@@ -211,15 +210,17 @@ function App() {
   );
 
   return (
-    <Container maxWidth="sm" disableGutters>
+    <Container maxWidth="sm" disableGutters className="prevent-select">
       <Box height="100vh" display="flex" flexDirection="column">
         <StyledBox
           sx={{
             backgroundColor: getColor("black"),
+            transform: "rotate(180deg)",
+            cursor: clockState.player === "black" ? "pointer" : "default",
           }}
           onClick={() => finishedMove("black")}
         >
-          <PresetBox sx={{ top: "1rem" }}>{clockState.preset}</PresetBox>
+          <PresetBox className="prevent-select">{clockState.preset}</PresetBox>
           <Timer
             resetToken={clockState.startTime}
             time={clockState.whiteRemaining}
@@ -234,7 +235,7 @@ function App() {
         <ControlBox>
           <RestartAltIcon color="primary" onClick={resetClock} />
           {clockState.started && !clockState.paused && (
-            <PauseIcon color="primary" onClick={stopClock} />
+            <PauseIcon color="warning" onClick={stopClock} />
           )}
           {(!clockState.started || clockState.paused) && (
             <PlayArrowIcon color="primary" onClick={startGame} />
@@ -256,10 +257,11 @@ function App() {
         <StyledBox
           sx={{
             backgroundColor: getColor("white"),
+            cursor: clockState.player === "white" ? "pointer" : "default",
           }}
           onClick={() => finishedMove("white")}
         >
-          <PresetBox sx={{ bottom: "2rem" }}>{clockState.preset}</PresetBox>
+          <PresetBox>{clockState.preset}</PresetBox>
           <Timer
             resetToken={clockState.startTime}
             time={clockState.blackRemaining}
@@ -269,9 +271,7 @@ function App() {
               clockState.player === "white"
             }
           ></Timer>
-          <MoveBox sx={{ left: "2rem", top: "1rem", right: "initial" }}>
-            Moves: {Math.max(clockState.moveCount, 0)}
-          </MoveBox>
+          <MoveBox>Moves: {Math.max(clockState.moveCount, 0)}</MoveBox>
         </StyledBox>
       </Box>
       <ToastContainer theme="colored" autoClose={1000} limit={1} />

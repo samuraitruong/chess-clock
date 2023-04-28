@@ -6,7 +6,7 @@ const ClockTime = styled(Typography)(({ theme }) => ({
   ...theme.typography.subtitle1,
   color: theme.palette.text.secondary,
   fontWeight: "bold",
-  fontSize: "5rem",
+  fontSize: "6rem",
 }));
 
 export function Timer({
