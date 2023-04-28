@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import "./App.css";
 import { Box, Container, styled, Typography } from "@mui/material";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
@@ -88,7 +88,18 @@ function App() {
     });
   };
   const startGame = () => {
-    toast("Game started");
+    console.log("clockState", clockState);
+    if (clockState.started && clockState.paused) {
+      toast.info("Game Resumed");
+      setClockState({
+        ...clockState,
+        paused: false,
+        startTime: new Date(),
+      });
+      return;
+    }
+
+    toast.success("Game started");
     setClockState({
       ...clockState,
       player: clockState.paused ? clockState.player : "white",
@@ -98,15 +109,33 @@ function App() {
       startTime: new Date(),
     });
   };
+
   const stopClock = () => {
+    let blackRemaining = clockState.blackRemaining;
+    let whiteRemaining = clockState.whiteRemaining;
+
+    if (clockState.startTime) {
+      if (clockState.player === "black") {
+        // update white remaining time
+        whiteRemaining -=
+          new Date().getTime() -
+          clockState.startTime.getTime() +
+          clockState.increment;
+      } else {
+        // update black remaining time
+        blackRemaining -=
+          new Date().getTime() -
+          clockState.startTime.getTime() +
+          clockState.increment;
+      }
+    }
+
     setClockState({
       ...clockState,
-      player: "",
-      moveCount: 0,
+      blackRemaining,
+      whiteRemaining,
       paused: true,
-      started: false,
     });
-    // update remaining time
   };
 
   const setSoundOnOff = (isOn: boolean) => {
@@ -171,30 +200,43 @@ function App() {
     setOpen(false);
   };
 
+  const getColor = useCallback(
+    (player: string) => {
+      if (player === clockState.player) {
+        return activeColor;
+      }
+      return defaultColor;
+    },
+    [clockState.player]
+  );
+
   return (
     <Container maxWidth="sm" disableGutters>
       <Box height="100vh" display="flex" flexDirection="column">
         <StyledBox
           sx={{
-            backgroundColor:
-              clockState.player === "white" ? activeColor : defaultColor,
+            backgroundColor: getColor("black"),
           }}
-          onClick={() => finishedMove("white")}
+          onClick={() => finishedMove("black")}
         >
           <PresetBox sx={{ top: "1rem" }}>{clockState.preset}</PresetBox>
           <Timer
             resetToken={clockState.startTime}
             time={clockState.whiteRemaining}
-            ticking={clockState.started && clockState.player === "white"}
+            ticking={
+              clockState.started &&
+              !clockState.paused &&
+              clockState.player === "black"
+            }
           ></Timer>
-          <MoveBox>Moves: {clockState.moveCount}</MoveBox>
+          <MoveBox>Moves: {Math.max(0, clockState.moveCount - 1)}</MoveBox>
         </StyledBox>
         <ControlBox>
           <RestartAltIcon color="primary" onClick={resetClock} />
-          {clockState.started && (
+          {clockState.started && !clockState.paused && (
             <PauseIcon color="primary" onClick={stopClock} />
           )}
-          {!clockState.started && (
+          {(!clockState.started || clockState.paused) && (
             <PlayArrowIcon color="primary" onClick={startGame} />
           )}
           <TuneIcon color="primary" onClick={() => setOpen(true)} />
@@ -213,23 +255,26 @@ function App() {
         </ControlBox>
         <StyledBox
           sx={{
-            backgroundColor:
-              clockState.player === "black" ? activeColor : defaultColor,
+            backgroundColor: getColor("white"),
           }}
-          onClick={() => finishedMove("black")}
+          onClick={() => finishedMove("white")}
         >
           <PresetBox sx={{ bottom: "2rem" }}>{clockState.preset}</PresetBox>
           <Timer
             resetToken={clockState.startTime}
             time={clockState.blackRemaining}
-            ticking={clockState.started && clockState.player === "black"}
+            ticking={
+              clockState.started &&
+              !clockState.paused &&
+              clockState.player === "white"
+            }
           ></Timer>
           <MoveBox sx={{ left: "2rem", top: "1rem", right: "initial" }}>
-            Moves: {Math.max(clockState.moveCount - 1, 0)}
+            Moves: {Math.max(clockState.moveCount, 0)}
           </MoveBox>
         </StyledBox>
       </Box>
-      <ToastContainer theme="colored" />
+      <ToastContainer theme="colored" autoClose={1000} limit={1} />
       <PresetDialog
         open={open}
         onClose={handleClosePreset}

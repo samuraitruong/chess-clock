@@ -10,6 +10,7 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import { IconButton, ListItemIcon, Stack, TextField } from "@mui/material";
 
 const presets = [
+  "1 min",
   "3 min",
   "3 min | 2 sec",
   "5 min | 3 sec",
@@ -29,7 +30,7 @@ export interface SimpleDialogProps {
 export function PresetDialog(props: SimpleDialogProps) {
   const { onClose, selectedValue, open } = props;
   const [min, setMin] = React.useState("10");
-  const [sec, setSec] = React.useState("");
+  const [sec, setSec] = React.useState("5");
 
   const handleClose = () => {
     onClose(selectedValue);
@@ -44,10 +45,10 @@ export function PresetDialog(props: SimpleDialogProps) {
 
   return (
     <Dialog onClose={handleClose} open={open} fullWidth>
-      <DialogTitle>Select a preset</DialogTitle>
+      <DialogTitle>Change timer</DialogTitle>
       <List sx={{ pt: 0 }}>
         {presets.map((preset) => (
-          <ListItem disableGutters>
+          <ListItem disableGutters key={preset} sx={{ padding: 0 }}>
             <ListItemButton
               onClick={() => handleListItemClick(preset)}
               key={preset}

@@ -31,7 +31,7 @@ export function Timer({
     if (!ticking) {
       return;
     }
-    const interval = countingTime < 60000 ? 200 : 1000;
+    const interval = countingTime < 60000 ? 100 : 500;
 
     if (!timerInterval) {
       // eslint-disable-next-line react-hooks/exhaustive-deps
