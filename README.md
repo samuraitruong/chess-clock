@@ -4,6 +4,11 @@ This is simple react page to build the chess tournament clock. The demonstration
 
 
 
+<img width="600" alt="image" src="https://user-images.githubusercontent.com/1183138/235273388-14f36637-922c-4d18-8662-81e997f3881b.png">
+
+
+<img width="608" alt="image" src="https://user-images.githubusercontent.com/1183138/235273401-8bc65c80-7c51-475e-b1fa-f325d34ef0b6.png">
+
 ## Available Scripts
 
 In the project directory, you can run:
