@@ -21,10 +21,12 @@ const StyledBox = styled(Box)(({ theme }) => ({
   textAlign: "center",
   display: "flex",
   alignItems: "center",
-  height: "46vh",
+  minHeight: "40vh",
   color: theme.palette.text.secondary,
   justifyContent: "center",
   position: "relative",
+  flexBasis: 0,
+  flexGrow: 1,
 }));
 
 const ControlBox = styled(Box)(({ theme }) => ({
@@ -36,6 +38,8 @@ const ControlBox = styled(Box)(({ theme }) => ({
   alignItems: "center",
   color: theme.palette.text.secondary,
   justifyContent: "space-around",
+  flexBasis: 0,
+  flexGrow: 0.1,
 }));
 
 const PresetBox = styled(Typography)(({ theme }) => ({
@@ -212,7 +216,13 @@ function App() {
 
   return (
     <Container maxWidth="sm" disableGutters className="prevent-select">
-      <Box height="100vh" display="flex" flexDirection="column">
+      <Box
+        height="100vh"
+        display="flex"
+        flexDirection="column"
+        justifyContent="space-between"
+        alignItems="stretch"
+      >
         <StyledBox
           sx={{
             backgroundColor: getColor("black"),
@@ -235,7 +245,7 @@ function App() {
         </StyledBox>
         <ControlBox>
           <IconButton>
-            <RestartAltIcon color="primary" onClick={resetClock} />
+            <RestartAltIcon color="error" onClick={resetClock} />
           </IconButton>
           {clockState.started && !clockState.paused && (
             <IconButton>
