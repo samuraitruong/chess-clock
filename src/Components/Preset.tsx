@@ -85,7 +85,7 @@ export function PresetDialog(props: SimpleDialogProps) {
           variant="standard"
         />
         <IconButton onClick={setCustomHanle}>
-          <ExitToAppIcon />
+          <ExitToAppIcon color="success" />
         </IconButton>
       </Stack>
     </Dialog>

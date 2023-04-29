@@ -13,6 +13,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { PresetDialog } from "./Components/Preset";
 import { parsePreset } from "./Utils";
 import IconButton from "@mui/material/IconButton";
+import { MoveChart } from "./Components/MoveChart";
+import BarChartIcon from "@mui/icons-material/BarChart";
 
 const StyledBox = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#E7EBEF",
@@ -27,6 +29,7 @@ const StyledBox = styled(Box)(({ theme }) => ({
   position: "relative",
   flexBasis: 0,
   flexGrow: 1,
+  flexDirection: "column-reverse",
 }));
 
 const ControlBox = styled(Box)(({ theme }) => ({
@@ -71,6 +74,9 @@ interface ClockState {
   blackRemaining: number;
   increment: number;
   paused: boolean;
+  blackMoves: number[];
+  whiteMoves: number[];
+  showChart: boolean;
 }
 
 const defaultSetup: ClockState = {
@@ -80,6 +86,10 @@ const defaultSetup: ClockState = {
   sound: true,
   paused: false,
   started: false,
+  blackMoves: [],
+  whiteMoves: [],
+  showChart: false,
+
   ...parsePreset("3 min | 2 sec"),
 };
 function App() {
@@ -150,7 +160,17 @@ function App() {
       sound: isOn,
     });
   };
+  const updateState = (updatedFields: Partial<ClockState>) => {
+    setClockState({ ...clockState, ...updatedFields });
+  };
+
+  const toggleChart = () => {
+    updateState({ showChart: !clockState.showChart });
+  };
   const finishedMove = (player: "white" | "black") => {
+    if (clockState.blackRemaining <= 0 || clockState.whiteRemaining <= 0) {
+      return;
+    }
     if (
       !clockState.started ||
       (player !== clockState.player && clockState.moveCount > 0) ||
@@ -161,17 +181,18 @@ function App() {
     }
     let blackRemaining = clockState.blackRemaining;
     let whiteRemaining = clockState.whiteRemaining;
+    let blackMoves = clockState.blackMoves;
+    let whiteMoves = clockState.whiteMoves;
+
     if (clockState.startTime) {
+      const moveTime = new Date().getTime() - clockState.startTime?.getTime();
+
       if (player === "white") {
-        whiteRemaining =
-          whiteRemaining -
-          (new Date().getTime() - clockState.startTime?.getTime()) +
-          clockState.increment;
+        whiteRemaining = whiteRemaining - moveTime + clockState.increment;
+        whiteMoves = [...whiteMoves, moveTime];
       } else {
-        blackRemaining =
-          blackRemaining -
-          (new Date().getTime() - clockState.startTime?.getTime()) +
-          clockState.increment;
+        blackRemaining = blackRemaining - moveTime + clockState.increment;
+        blackMoves = [...blackMoves, moveTime];
       }
       if (clockState.sound) {
         const audio = new Audio(document.location.href + "/click.mp3");
@@ -186,6 +207,8 @@ function App() {
       startTime: new Date(),
       blackRemaining,
       whiteRemaining,
+      blackMoves,
+      whiteMoves,
     });
   };
 
@@ -207,11 +230,17 @@ function App() {
   const getColor = useCallback(
     (player: string) => {
       if (player === clockState.player) {
+        const remaining =
+          player === "white"
+            ? clockState.whiteRemaining
+            : clockState.blackRemaining;
+        if (remaining < 30000) return "#fd0000";
+
         return activeColor;
       }
       return defaultColor;
     },
-    [clockState.player]
+    [clockState.player, clockState.blackRemaining, clockState.whiteRemaining]
   );
 
   return (
@@ -231,6 +260,7 @@ function App() {
           }}
           onClick={() => finishedMove("black")}
         >
+          {clockState.showChart && <MoveChart data={clockState.blackMoves} />}
           <PresetBox className="prevent-select">{clockState.preset}</PresetBox>
           <Timer
             resetToken={clockState.startTime}
@@ -276,6 +306,12 @@ function App() {
               />
             </IconButton>
           )}
+          <IconButton>
+            <BarChartIcon
+              color={clockState.showChart ? "error" : "success"}
+              onClick={toggleChart}
+            />
+          </IconButton>
         </ControlBox>
         <StyledBox
           sx={{
@@ -285,6 +321,7 @@ function App() {
           onClick={() => finishedMove("white")}
         >
           <PresetBox>{clockState.preset}</PresetBox>
+          {clockState.showChart && <MoveChart data={clockState.whiteMoves} />}
           <Timer
             resetToken={clockState.startTime}
             time={clockState.blackRemaining}
