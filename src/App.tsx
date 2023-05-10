@@ -264,7 +264,7 @@ function App() {
           <PresetBox className="prevent-select">{clockState.preset}</PresetBox>
           <Timer
             resetToken={clockState.startTime}
-            time={clockState.whiteRemaining}
+            time={clockState.blackRemaining}
             ticking={
               clockState.started &&
               !clockState.paused &&
@@ -324,7 +324,7 @@ function App() {
           {clockState.showChart && <MoveChart data={clockState.whiteMoves} />}
           <Timer
             resetToken={clockState.startTime}
-            time={clockState.blackRemaining}
+            time={clockState.whiteRemaining}
             ticking={
               clockState.started &&
               !clockState.paused &&

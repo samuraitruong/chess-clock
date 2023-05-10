@@ -53,6 +53,7 @@ const options = {
 
 export interface MoveChartProps {
   data: number[];
+  color?: string;
 }
 export function MoveChart(props: MoveChartProps) {
   const labels = props.data.map((x, index) => index + 1);
@@ -62,7 +63,7 @@ export function MoveChart(props: MoveChartProps) {
       {
         label: "Move",
         data: props.data,
-        backgroundColor: "rgba(255, 99, 132, 0.5)",
+        backgroundColor: props.color || "rgba(255, 99, 132, 0.5)",
       },
     ],
   };
