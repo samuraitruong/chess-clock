@@ -1,13 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { styled, Typography } from "@mui/material";
-import { formatTime } from "../Utils";
-
-const ClockTime = styled(Typography)(({ theme }) => ({
-  ...theme.typography.subtitle1,
-  color: theme.palette.text.secondary,
-  fontWeight: "bold",
-  fontSize: "6rem",
-}));
+import React, { useCallback, useEffect, useState, useRef } from "react";
+import { formatTime } from "../utils/Utils";
 
 export function Timer({
   time,
@@ -19,43 +11,58 @@ export function Timer({
   resetToken?: Date;
 }) {
   const [countingTime, setCountingTime] = useState(time);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  let timerInterval: any = undefined;
-
-  const updateTimer = useCallback(() => {
-    if (!ticking && timerInterval) {
-      clearInterval(timerInterval);
-      return;
+  const clearTimer = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
     }
+  }, []);
 
-    if (!ticking) {
-      return;
-    }
+  const startTimer = useCallback(() => {
+    clearTimer(); // Clear any existing timer first
+
+    if (!ticking) return;
+
     const interval = countingTime < 60000 ? 100 : 500;
 
-    if (!timerInterval) {
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      timerInterval = setInterval(() => {
-        setCountingTime(countingTime - interval);
-      }, interval);
-    }
-    if (countingTime <= 0) {
-      clearInterval(timerInterval);
-      setCountingTime(0);
-    }
-  }, [ticking, time, countingTime]);
+    intervalRef.current = setInterval(() => {
+      setCountingTime((prevTime) => {
+        const newTime = prevTime - interval;
+        if (newTime <= 0) {
+          clearTimer();
+          return 0;
+        }
+        return newTime;
+      });
+    }, interval);
+  }, [ticking, countingTime, clearTimer]);
 
+  // Reset timer when resetToken or time changes
   useEffect(() => {
     setCountingTime(time);
   }, [resetToken, time]);
 
+  // Start/stop timer based on ticking state
   useEffect(() => {
-    updateTimer();
+    if (ticking) {
+      startTimer();
+    } else {
+      clearTimer();
+    }
 
-    return () => {
-      if (timerInterval) clearInterval(timerInterval);
-    };
-  }, [updateTimer, time, timerInterval]);
+    return clearTimer;
+  }, [ticking, startTimer, clearTimer]);
 
-  return <ClockTime>{formatTime(countingTime)}</ClockTime>;
+  // Cleanup on unmount
+  useEffect(() => {
+    return clearTimer;
+  }, [clearTimer]);
+
+  return (
+    <div className="timer-text text-gray-700 font-bold select-none">
+      {formatTime(countingTime)}
+    </div>
+  );
 }

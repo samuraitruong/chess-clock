@@ -1,76 +1,43 @@
-import { Box } from "@mui/material";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import { Bar } from "react-chartjs-2";
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+"use client";
 
-const options = {
-  responsive: true,
-  maintainAspectRatio: false,
-  scales: {
-    x: {
-      ticks: {
-        display: false,
-      },
-      grid: {
-        display: false,
-      },
-    },
-    y: {
-      ticks: {
-        display: false,
-      },
-      grid: {
-        display: false,
-      },
-    },
-  },
-  plugins: {
-    legend: {
-      display: false,
-      position: "top" as const,
-    },
-    title: {
-      display: false,
-      text: "Chart.js Bar Chart",
-    },
-  },
-};
+import { useEffect, useState } from "react";
 
 export interface MoveChartProps {
   data: number[];
   color?: string;
 }
+
 export function MoveChart(props: MoveChartProps) {
-  const labels = props.data.map((x, index) => index + 1);
-  const data = {
-    labels,
-    datasets: [
-      {
-        label: "Move",
-        data: props.data,
-        backgroundColor: props.color || "rgba(255, 99, 132, 0.5)",
-      },
-    ],
-  };
-  if (props.data.length === 0) return <></>;
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient || props.data.length === 0) {
+    return null;
+  }
+
+  const maxTime = Math.max(...props.data);
+  const minTime = Math.min(...props.data);
+  const range = maxTime - minTime || 1;
+
   return (
-    <Box sx={{ height: "100px", width: "100%" }}>
-      <Bar data={data} options={options} />
-    </Box>
+    <div className="h-24 w-full flex items-end justify-center space-x-1 px-4">
+      {props.data.map((time, index) => {
+        const height = Math.max(4, ((time - minTime) / range) * 80);
+        return (
+          <div
+            key={index}
+            className="bg-blue-500 opacity-70 min-w-[2px] rounded-t"
+            style={{
+              height: `${height}px`,
+              backgroundColor: props.color || "rgba(59, 130, 246, 0.7)",
+            }}
+            title={`Move ${index + 1}: ${(time / 1000).toFixed(1)}s`}
+          />
+        );
+      })}
+    </div>
   );
 }
