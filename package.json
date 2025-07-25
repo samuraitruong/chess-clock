@@ -2,7 +2,7 @@
   "name": "chess-clock",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://samuraitruong.github.io/chess-clock",
+  "homepage": "https://chess-clock.truongthings.dev",
   "dependencies": {
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
